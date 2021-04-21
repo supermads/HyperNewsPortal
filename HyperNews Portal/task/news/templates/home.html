@@ -7,6 +7,13 @@
 <body>
     <h2>Hyper news</h2>
 
+    <form action="" method="get">
+        {% csrf_token %}
+        <p>Search:</p>
+        <input type="text" name="q">
+        <button type="submit">Submit</button>
+    </form>
+
     {% regroup articles by date as date_list %}
 
     {% for date in date_list %}

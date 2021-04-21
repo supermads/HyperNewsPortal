@@ -16,8 +16,12 @@ class HomeView(View):
     def get(self, request, *args, **kwargs):
         for article in articles:
             article["date"] = article.get("created")[0:10]
-
-        return render(request, "home.html", context={"articles": articles})
+        q = request.GET.get("q", None)
+        if q:
+            searched_articles = [article for article in articles if q in article.get("title")]
+        else:
+            searched_articles = articles
+        return render(request, "home.html", context={"articles": searched_articles})
 
 
 class ArticleView(View):
@@ -64,5 +68,7 @@ class CreateView(View):
             "title": title,
             "link": link
         })
+
+        articles = sorted(articles, key=lambda i: i['created'], reverse=True)
 
         return redirect('/news')
