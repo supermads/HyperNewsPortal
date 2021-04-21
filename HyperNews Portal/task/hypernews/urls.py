@@ -16,12 +16,13 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from django.views.generic import RedirectView
-from news.views import NewsView, ArticleView
+from news.views import HomeView, ArticleView, CreateView
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', RedirectView.as_view(url="/news")),
-    path('news/', NewsView.as_view()),
-    path('news/<int:post_id>/', ArticleView.as_view())
+    path('', RedirectView.as_view(url='/news')),
+    path('news/', HomeView.as_view()),
+    path('news/<int:post_id>/', ArticleView.as_view()),
+    path('news/create/', CreateView.as_view())
 ]

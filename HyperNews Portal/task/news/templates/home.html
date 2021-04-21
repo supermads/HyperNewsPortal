@@ -5,6 +5,20 @@
     <title>Home</title>
 </head>
 <body>
-    <div>Coming soon</div>
+    <h2>Hyper news</h2>
+
+    {% regroup articles by date as date_list %}
+
+    {% for date in date_list %}
+        <h4>{{ date.grouper }}</h4>
+
+        <ul>
+            {% for article in date.list %}
+                <li><a target="_blank" href="/news/{{ article.link }}/">{{ article.title }}</a></li>
+            {% endfor %}
+        </ul>
+    {% endfor %}
+
+    <a href="/news/create/" target="_blank">Create</a>
 </body>
 </html>
