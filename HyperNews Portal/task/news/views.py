@@ -1,30 +1,34 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.views import View
 import json
+from datetime import datetime
+import random
 
 
-# Create your views here.
+with open("hypernews/news.json", "r") as json_file:
+    articles = sorted(json.load(json_file), key=lambda i: i['created'], reverse=True)
+    links = []
+    for article in articles:
+        links.append(article.get("link"))
+
+
 class HomeView(View):
     def get(self, request, *args, **kwargs):
-        with open("hypernews/news.json", "r") as json_file:
-            articles = sorted(json.load(json_file), key=lambda i: i['created'], reverse=True)
-            for article in articles:
-                article["date"] = article.get("created")[0:10]
+        for article in articles:
+            article["date"] = article.get("created")[0:10]
 
         return render(request, "home.html", context={"articles": articles})
 
 
 class ArticleView(View):
     def get(self, request, post_id, *args, **kwargs):
-        with open("hypernews/news.json", "r") as json_file:
-            articles = json.load(json_file)
-            for article in articles:
-                art_id = article.get("link")
-                if art_id == post_id:
-                    title = article.get("title")
-                    created = article.get("created")
-                    text = article.get("text")
-                    link = art_id
+        for article in articles:
+            art_id = article.get("link")
+            if art_id == post_id:
+                title = article.get("title")
+                created = article.get("created")
+                text = article.get("text")
+                link = art_id
 
         context = {
             "link": link,
@@ -39,3 +43,26 @@ class ArticleView(View):
 class CreateView(View):
     def get(self, request, *args, **kwargs):
         return render(request, "create.html", context={})
+
+    def post(self, request, *args, **kwargs):
+        global articles, links
+
+        title = request.POST.get("title")
+        text = request.POST.get("text")
+        created = str(datetime.now())
+
+        # generate random number for link, making sure it doesn't match any existing link
+        link_found = False
+        while not link_found:
+            link = random.randint(1, 2000)
+            if link not in links:
+                link_found = True
+
+        articles.append({
+            "created": created,
+            "text": text,
+            "title": title,
+            "link": link
+        })
+
+        return redirect('/news')
